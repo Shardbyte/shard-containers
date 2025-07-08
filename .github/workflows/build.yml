@@ -31,7 +31,7 @@ jobs:
 
       - name: Detect changes in ${{ matrix.tag }}
         id: changes
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         with:
           list-files: json
           filters: |
