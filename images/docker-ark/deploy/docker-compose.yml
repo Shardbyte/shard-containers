@@ -1,0 +1,55 @@
+#################################################
+# Copyright (c) Shardbyte. All Rights Reserved. #
+# SPDX-License-Identifier: MIT                  #
+#################################################
+# Shardbyte Docker Compose | docker-compose.yml
+#
+#
+#
+services:
+#######################################################
+  ark_server:
+    image: 'ghcr.io/shardbyte/steamcmd:latest'
+    container_name: ark_server
+    restart: unless-stopped
+    environment:
+# === This setup is necessary if you have to download a non-anonymous appID/modID
+      # STEAM_LOGIN: ${STEAM_LOGIN}
+      SESSION_NAME: ${SESSION_NAME}
+      SERVER_MAP: ${SERVER_MAP}
+      SERVER_PASSWORD: ${SERVER_PASSWORD}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      MAX_PLAYERS: ${MAX_PLAYERS}
+      UPDATE_ON_START: ${UPDATE_ON_START}
+      BACKUP_ON_STOP: ${BACKUP_ON_STOP}
+      PRE_UPDATE_BACKUP: ${PRE_UPDATE_BACKUP}
+      WARN_ON_STOP: ${WARN_ON_STOP}
+      ENABLE_CROSSPLAY: ${ENABLE_CROSSPLAY}
+      DISABLE_BATTLEYE: ${DISABLE_BATTLEYE}
+      ARK_SERVER_VOLUME: ${ARK_SERVER_VOLUME}
+      GAME_MOD_IDS: ${GAME_MOD_IDS}
+      GAME_CLIENT_PORT: ${GAME_CLIENT_PORT}
+      UDP_SOCKET_PORT: ${UDP_SOCKET_PORT}
+      RCON_PORT: ${RCON_PORT}
+      SERVER_LIST_PORT: ${SERVER_LIST_PORT}
+    volumes:
+# === This setup is necessary if you have to download a non-anonymous appID/modID
+      # - '${STEAM_SESSION_VOLUME}:/home/steam/Steam'
+      - '${ARK_SERVER_VOLUME}:/app'
+      - '${ARK_SERVER_VOLUME}/ark-backups:/home/steam/ARK-Backups'
+    networks:
+      - ark_network
+    ports:
+      # Port for connections from ARK game client
+      - "${GAME_CLIENT_PORT}:${GAME_CLIENT_PORT}/udp"
+      # Raw UDP socket port (always Game client port +1)
+      - "${UDP_SOCKET_PORT}:${UDP_SOCKET_PORT}/udp"
+      # RCON management port
+      - "${RCON_PORT}:${RCON_PORT}/tcp"
+      # Steam's server-list port
+      - "${SERVER_LIST_PORT}:${SERVER_LIST_PORT}/udp"
+#######################################################
+networks:
+  ark_network:
+    name: ark_network
+#######################################################

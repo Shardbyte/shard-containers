@@ -22,6 +22,7 @@ jobs:
       matrix:
         tag:
           - steamcmd
+          - docker-ark
 
     steps:
       - name: Checkout repository
