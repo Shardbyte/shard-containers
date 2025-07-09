@@ -26,6 +26,7 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     GAME_MOD_IDS="" \
     UPDATE_ON_START="false" \
     BACKUP_ON_STOP="false" \
+    BACKUP_POST_COMMAND="echo 'Backup complete'" \
     PRE_UPDATE_BACKUP="true" \
     WARN_ON_STOP="true" \
     ARK_TOOLS_VERSION="${ARK_TOOLS_VERSION}" \
