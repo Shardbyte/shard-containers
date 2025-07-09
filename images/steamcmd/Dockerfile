@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT                  #
 #################################################
 #
-
 FROM debian:bookworm-slim
 
 LABEL   author="Shardbyte" maintainer="yolks@shardbyte.com" \

@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-# check=skip=SecretsUsedInArgOrEnv;error=true
 #################################################
 # Copyright (c) Shardbyte. All Rights Reserved. #
 # SPDX-License-Identifier: MIT                  #
