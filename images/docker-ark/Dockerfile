@@ -9,9 +9,9 @@ FROM ghcr.io/shardbyte/steamcmd:latest
 
 LABEL author="Shardbyte" \
       maintainer="containers@shardbyte.com" \
-      org.opencontainers.image.source="https://github.com/Shardbyte/docker-ark-server" \
+      org.opencontainers.image.source="https://github.com/Shardbyte/shard-containers" \
       org.opencontainers.image.description="Application packaged by Shardbyte" \
-      org.opencontainers.image.title="docker-ark-server" \
+      org.opencontainers.image.title="docker-ark" \
       org.opencontainers.image.licenses="MIT"
 
 ARG ARK_TOOLS_VERSION="latest"
