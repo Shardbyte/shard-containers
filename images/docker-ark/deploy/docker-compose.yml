@@ -34,9 +34,15 @@ services:
       UDP_SOCKET_PORT: ${UDP_SOCKET_PORT}
       RCON_PORT: ${RCON_PORT}
       SERVER_LIST_PORT: ${SERVER_LIST_PORT}
+# === This setup is only necessary if you want to use a custom ARK server configuration
+      # GUS_FILE: ${GUS_DIR}
+      # GI_FILE: ${GI_DIR}
     volumes:
 # === This setup is necessary if you have to download a non-anonymous appID/modID
       # - '${STEAM_SESSION_VOLUME}:/home/steam/Steam'
+# === This setup is only necessary if you want to use a custom ARK server configuration
+      # - '${ARK_SERVER_VOLUME}/custom_ini/GameUserSettings.ini:/app'
+      # - '${ARK_SERVER_VOLUME}/custom_ini/Game.ini:/app'
       - '${ARK_SERVER_VOLUME}:/app'
       - '${ARK_SERVER_VOLUME}/ark-backups:/home/steam/ARK-Backups'
     networks:
