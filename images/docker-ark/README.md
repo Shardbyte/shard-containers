@@ -25,10 +25,12 @@ The basic configuration of your server is done by using environment variables wh
 | `SESSION_NAME` | `Dockerized ARK Server by github.com/hermsi1337` | The name of your ARK session which is visible in game when searching for servers |
 | `SERVER_MAP` | `TheIsland` | Desired map you want to play |
 | `SERVER_PASSWORD` | `YouShallNotPass` | Server password which is required to join your session (use empty string to disable password authentication) |
+| `SERVER_PVE` | `false` | Enable PVE mode |
 | `ADMIN_PASSWORD` | `Th155houldD3f1n3tlyB3Chang3d` | Admin password to access the admin console of ARK |
 | `MAX_PLAYERS` | `20` | Maximum number of players to join your session |
 | `UPDATE_ON_START` | `false` | Whether you want to update the ARK server upon startup or not |
 | `BACKUP_ON_STOP` | `false` | Create a backup before gracefully stopping the ARK server |
+| `BACKUP_POST_COMMAND` | `echo 'Backup complete'` | Command to run after backup |
 | `PRE_UPDATE_BACKUP` | `true` | Create a backup before updating ARK server |
 | `WARN_ON_STOP` | `true` | Broadcast a warning upon graceful shutdown |
 | `ENABLE_CROSSPLAY` | `false` | Enable crossplay. When enabled, BattlEye should be disabled as it likes to disconnect Epic players |

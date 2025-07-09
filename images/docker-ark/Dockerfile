@@ -21,6 +21,7 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     SESSION_NAME="Dockerized ARK Server" \
     SERVER_MAP="TheIsland" \
     SERVER_PASSWORD="theDEFAULTpassword" \
+    SERVER_PVE="false" \
     ADMIN_PASSWORD="changeMEplease" \
     MAX_PLAYERS="20" \
     GAME_MOD_IDS="" \
