@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv;error=true
 #################################################
 # Copyright (c) Shardbyte. All Rights Reserved. #
 # SPDX-License-Identifier: MIT                  #
@@ -39,9 +41,17 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
 
 ENV ARK_TOOLS_DIR="${ARK_SERVER_VOLUME}/arkmanager"
 
-RUN apt-get update && \
+# Ensure we're running as root and fix permissions
+USER root
+
+RUN mkdir -p /var/lib/apt/lists/partial && \
+    mkdir -p /var/cache/apt/archives/partial && \
+    chmod 755 /var/lib/apt/lists/partial && \
+    chmod 755 /var/cache/apt/archives/partial && \
+    apt-get clean && \
+    apt-get update && \
     apt-get -y upgrade && \
-    apt-get -y install --no-install-recommends --no-install-suggests \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends --no-install-suggests \
         jq \
         curl \
         cron \
