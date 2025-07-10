@@ -80,8 +80,8 @@ RUN dpkg --add-architecture i386 && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /home/steam/Steam/logs/*
 
-COPY bin/ /
-COPY conf.d ${TEMPLATE_DIRECTORY}
+COPY --chown=steam:steam bin/ /
+COPY --chown=steam:steam conf.d ${TEMPLATE_DIRECTORY}
 
 EXPOSE ${GAME_CLIENT_PORT}/udp \
        ${UDP_SOCKET_PORT}/udp \
