@@ -31,6 +31,8 @@ RUN dpkg --add-architecture i386 \
         ca-certificates \
         locales \
         steamcmd \
+        lib32gcc-s1 \
+        lib32stdc++6 \
     && sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
     && locale-gen en_US.UTF-8 \
     && update-locale LANG=en_US.UTF-8 \
