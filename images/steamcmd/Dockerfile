@@ -49,8 +49,6 @@ RUN dpkg --add-architecture i386 \
     && rm -rf /usr/share/man/* \
     && rm -rf /usr/share/info/* \
     && rm -rf /usr/share/locale/* \
-    && rm -rf /usr/share/perl5/* \
-    && rm -rf /usr/lib/*/perl-base/* \
     && find /usr/share/i18n/locales/ -type f ! -name 'en_US' -delete \
     && find /usr/share/i18n/charmaps/ -type f ! -name 'UTF-8.gz' -delete \
     && find /usr/lib -name "*.a" -delete \
