@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT                  #
 #################################################
 
-FROM ghcr.io/shardbyte/steamcmd:latest
+FROM shardbyte/steamcmd
 
 LABEL author="Shardbyte" \
       maintainer="containers@shardbyte.com" \
@@ -14,6 +14,7 @@ LABEL author="Shardbyte" \
 
 ARG ARK_TOOLS_VERSION="latest"
 ARG IMAGE_VERSION="dev"
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     SESSION_NAME="Dockerized ARK Server" \
@@ -25,7 +26,7 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     GAME_MOD_IDS="" \
     UPDATE_ON_START="false" \
     BACKUP_ON_STOP="false" \
-    BACKUP_POST_COMMAND="echo 'Backup complete'" \
+    BACKUP_POST_COMMAND="echo 'Backup Complete!'" \
     PRE_UPDATE_BACKUP="true" \
     WARN_ON_STOP="true" \
     ARK_TOOLS_VERSION="${ARK_TOOLS_VERSION}" \
@@ -41,26 +42,22 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
 
 ENV ARK_TOOLS_DIR="${ARK_SERVER_VOLUME}/arkmanager"
 
-# Ensure we're running as root and fix permissions
-USER root
-
-RUN mkdir -p /var/lib/apt/lists/partial && \
-    mkdir -p /var/cache/apt/archives/partial && \
-    chmod 755 /var/lib/apt/lists/partial && \
-    chmod 755 /var/cache/apt/archives/partial && \
+RUN dpkg --add-architecture i386 && \
     apt-get clean && \
     apt-get update && \
     apt-get -y upgrade && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends --no-install-suggests \
+    apt-get -y install --no-install-recommends --no-install-suggests \
         jq \
         curl \
         cron \
         lsof \
         gosu \
         bzip2 \
+        gzip \
+        perl \
+        perl-modules \
         libc6-i386 \
-        lib32gcc-s1 \
-        perl-modules && \
+        lib32gcc-s1 && \
     if [ "${ARK_TOOLS_VERSION}" = "latest" ]; then \
         DOWNLOAD_VERSION=$(curl -s https://api.github.com/repos/arkmanager/ark-server-tools/releases/latest | jq -r '.tag_name' | sed 's/^v//'); \
     else \
@@ -89,6 +86,7 @@ EXPOSE ${GAME_CLIENT_PORT}/udp \
 
 VOLUME ["${ARK_SERVER_VOLUME}"]
 WORKDIR ${ARK_SERVER_VOLUME}
+USER ${USER}
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD []
