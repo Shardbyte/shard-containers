@@ -83,6 +83,9 @@ RUN dpkg --add-architecture i386 && \
 COPY --chown=steam:steam bin/ /
 COPY --chown=steam:steam conf.d ${TEMPLATE_DIRECTORY}
 
+RUN chmod +x /docker-entrypoint.sh && \
+    chmod +x /steam-entrypoint.sh
+
 EXPOSE ${GAME_CLIENT_PORT}/udp \
        ${UDP_SOCKET_PORT}/udp \
        ${SERVER_LIST_PORT}/udp \
