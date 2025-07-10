@@ -42,6 +42,9 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
 
 ENV ARK_TOOLS_DIR="${ARK_SERVER_VOLUME}/arkmanager"
 
+# Switch to root for package installation
+USER root
+
 RUN dpkg --add-architecture i386 && \
     apt-get clean && \
     apt-get update && \
@@ -49,12 +52,13 @@ RUN dpkg --add-architecture i386 && \
     apt-get -y install --no-install-recommends --no-install-suggests \
         jq \
         curl \
+        perl \
         cron \
         lsof \
         gosu \
-        bzip2 \
         gzip \
-        perl \
+        bzip2 \
+        perl-base \
         perl-modules \
         libc6-i386 \
         lib32gcc-s1 && \
