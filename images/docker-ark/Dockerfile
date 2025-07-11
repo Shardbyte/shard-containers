@@ -42,6 +42,9 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
 
 ENV ARK_TOOLS_DIR="${ARK_SERVER_VOLUME}/arkmanager"
 
+# Ensure we're running as root
+USER root
+
 RUN dpkg --add-architecture i386 && \
     apt-get clean && \
     apt-get update && \
@@ -67,8 +70,8 @@ RUN dpkg --add-architecture i386 && \
     echo "Downloading ARK server tools version: ${DOWNLOAD_VERSION}" && \
     curl -fsSL "https://github.com/arkmanager/ark-server-tools/archive/v${DOWNLOAD_VERSION}.tar.gz" | \
         tar xzf - -C /tmp/ && \
-    cd "/tmp/ark-server-tools-${DOWNLOAD_VERSION}/tools" && \
     rm -rf /etc/arkmanager 2>/dev/null || true && \
+    cd "/tmp/ark-server-tools-${DOWNLOAD_VERSION}/tools" && \
     bash -x install.sh root && \
     ln -s /usr/local/bin/arkmanager /usr/bin/arkmanager && \
     install -d "${ARK_SERVER_VOLUME}" && \

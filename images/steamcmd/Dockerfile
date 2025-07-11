@@ -72,6 +72,5 @@ WORKDIR ${STEAMCMDDIR}
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD test -f "${STEAMCMDDIR}/steamcmd.sh" || exit 1
 
-# Default command
 ENTRYPOINT ["./steamcmd.sh"]
 CMD ["+help", "+quit"]
