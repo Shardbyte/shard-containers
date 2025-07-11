@@ -33,36 +33,9 @@ fi
 
 # Set ownership of ARK server volume (skip if mounted volume)
 echo "Setting ownership of ${ARK_SERVER_VOLUME} to ${STEAM_USER}"
-if ! chown "${STEAM_USER}:${STEAM_USER}" "${ARK_SERVER_VOLUME}" 2>/dev/null; then
+if ! chown -R "${STEAM_USER}:${STEAM_USER}" "${ARK_SERVER_VOLUME}" 2>/dev/null; then
     echo "WARNING: Failed to set ownership on ${ARK_SERVER_VOLUME} (likely mounted volume), continuing startup..."
 fi
-
-# Ensure essential directories exist and have correct ownership
-echo "Creating essential directories with proper ownership..."
-create_dirs_with_ownership() {
-    local dirs=(
-        "${ARK_SERVER_VOLUME}/server"
-        "${ARK_SERVER_VOLUME}/server/ShooterGame"
-        "${ARK_SERVER_VOLUME}/server/ShooterGame/Saved"
-        "${ARK_SERVER_VOLUME}/server/ShooterGame/Saved/SavedArks"
-        "${ARK_SERVER_VOLUME}/server/ShooterGame/Content"
-        "${ARK_SERVER_VOLUME}/server/ShooterGame/Content/Mods"
-        "${ARK_SERVER_VOLUME}/server/ShooterGame/Binaries"
-        "${ARK_SERVER_VOLUME}/server/ShooterGame/Binaries/Linux"
-        "${ARK_SERVER_VOLUME}/log"
-        "${ARK_SERVER_VOLUME}/backup"
-        "${ARK_SERVER_VOLUME}/staging"
-    )
-
-    for dir in "${dirs[@]}"; do
-        if [[ ! -d "${dir}" ]]; then
-            mkdir -p "${dir}" 2>/dev/null || echo "WARNING: Could not create ${dir}"
-        fi
-        chown "${STEAM_USER}:${STEAM_USER}" "${dir}" 2>/dev/null || true
-    done
-}
-
-create_dirs_with_ownership
 
 # ===============================================================================
 # ARK TOOLS CONFIGURATION
