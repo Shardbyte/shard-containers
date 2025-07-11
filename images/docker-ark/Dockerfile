@@ -83,6 +83,9 @@ RUN dpkg --add-architecture i386 && \
 COPY bin/ /
 COPY conf.d ${TEMPLATE_DIRECTORY}
 
+# Make all entrypoint scripts executable for all users
+RUN chmod +x /docker-entrypoint.sh /steam-entrypoint.sh
+
 EXPOSE ${GAME_CLIENT_PORT}/udp \
        ${UDP_SOCKET_PORT}/udp \
        ${SERVER_LIST_PORT}/udp \
