@@ -74,8 +74,11 @@ RUN dpkg --add-architecture i386 && \
     cd "/tmp/ark-server-tools-${DOWNLOAD_VERSION}/tools" && \
     sed -i 's/steam\./root:/g' install.sh && \
     sed -i 's/chown steam/chown root/g' install.sh && \
+    sed -i 's/root\./root:/g' install.sh && \
     bash -x install.sh root && \
     ln -s /usr/local/bin/arkmanager /usr/bin/arkmanager && \
+    sed -i 's/steamcmd_user="steam"/steamcmd_user="root"/g' /etc/arkmanager/arkmanager.cfg && \
+    sed -i 's/arkserverroot="\/home\/steam"/arkserverroot="\/opt\/steam"/g' /etc/arkmanager/arkmanager.cfg && \
     install -d "${ARK_SERVER_VOLUME}" && \
     cd "${HOMEDIR}" && HOME="${HOMEDIR}" ${STEAMCMDDIR}/steamcmd.sh +login anonymous +quit && \
     apt-get -y autoremove && \
