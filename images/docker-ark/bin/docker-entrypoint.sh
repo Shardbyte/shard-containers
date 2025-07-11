@@ -45,8 +45,8 @@ fi
 if [[ ! -d "${ARK_TOOLS_DIR}" ]]; then
     echo "Initializing ARK tools directory: ${ARK_TOOLS_DIR}"
 
-    # Create the directory first
-    mkdir -p "${ARK_TOOLS_DIR}"
+    # Create the directory structure first
+    mkdir -p "${ARK_TOOLS_DIR}/instances"
 
     # Move default arkmanager config to persistent location if it exists
     if [[ -d "/etc/arkmanager" ]] && [[ ! -L "/etc/arkmanager" ]]; then
