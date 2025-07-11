@@ -35,6 +35,7 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     ARK_SERVER_VOLUME="/app" \
     TEMPLATE_DIRECTORY="/conf.d" \
     STEAM_HOME="${HOMEDIR}" \
+    USER="root" \
     STEAM_USER="${USER}" \
     STEAM_LOGIN="anonymous" \
     GAME_CLIENT_PORT="7777" \
