@@ -105,6 +105,8 @@ copy_missing_file() {
     local destination="${2}"
 
     if [[ ! -f "${destination}" ]]; then
+        # Ensure destination directory exists
+        mkdir -p "$(dirname "${destination}")"
         cp -a "${source}" "${destination}"
         echo "Copied ${source} to ${destination}"
     fi
