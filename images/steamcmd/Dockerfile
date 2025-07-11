@@ -13,11 +13,12 @@ LABEL   author="Shardbyte" maintainer="containers@shardbyte.com" \
 
 ARG PUID=1000
 ARG DEBIAN_FRONTEND=noninteractive
-ENV USER=root
-ENV HOMEDIR="/opt/steam"
+ENV USER=steam
+ENV HOMEDIR="/home/${USER}"
 ENV STEAMCMDDIR="${HOMEDIR}/steamcmd" \
     LANG=en_US.UTF-8
 
+# Configure Steam package installation prompts & Debian sources
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
     && echo steam steam/license note '' | debconf-set-selections \
@@ -35,7 +36,9 @@ RUN dpkg --add-architecture i386 \
     && sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
     && locale-gen en_US.UTF-8 \
     && update-locale LANG=en_US.UTF-8 \
-    && mkdir -p "${HOMEDIR}" "${STEAMCMDDIR}" \
+    && useradd -u "${PUID}" -m "${USER}" \
+    && mkdir -p "${STEAMCMDDIR}" \
+    && chown "${USER}:${USER}" "${STEAMCMDDIR}" \
     && ln -s /usr/games/steamcmd "${STEAMCMDDIR}/steamcmd.sh" \
     && ln -s /usr/games/steamcmd /usr/bin/steamcmd \
     && apt-get -y autoremove \
@@ -53,8 +56,12 @@ RUN dpkg --add-architecture i386 \
     && find /usr/lib -name "*.a" -delete \
     && find /usr/lib -name "*.la" -delete
 
-RUN cd "${HOMEDIR}" \
-    && HOME="${HOMEDIR}" steamcmd +quit \
+# Switch to steam user for SteamCMD initialization and setup
+USER ${USER}
+WORKDIR ${HOMEDIR}
+
+# Initialize SteamCMD and set up required symlinks
+RUN steamcmd +quit \
     && mkdir -p "${HOMEDIR}/.steam/sdk32" "${HOMEDIR}/.steam/sdk64" \
     && ln -s "${HOMEDIR}/.local/share/Steam/steamcmd/linux32" "${HOMEDIR}/.steam/sdk32" \
     && ln -s "${HOMEDIR}/.local/share/Steam/steamcmd/linux64" "${HOMEDIR}/.steam/sdk64" \
@@ -67,10 +74,12 @@ RUN cd "${HOMEDIR}" \
     && rm -rf "${HOMEDIR}/.local/share/Steam/steamcmd/logs"/* \
     && rm -rf "${HOMEDIR}/.cache/steam"/* 2>/dev/null || true
 
+# Set working directory and add healthcheck
 WORKDIR ${STEAMCMDDIR}
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD test -f "${STEAMCMDDIR}/steamcmd.sh" || exit 1
 
+# Default command
 ENTRYPOINT ["./steamcmd.sh"]
 CMD ["+help", "+quit"]

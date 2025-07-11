@@ -12,8 +12,6 @@ LABEL author="Shardbyte" \
       org.opencontainers.image.title="docker-ark" \
       org.opencontainers.image.licenses="MIT"
 
-
-USER root
 ARG ARK_TOOLS_VERSION="latest"
 ARG IMAGE_VERSION="dev"
 ARG DEBIAN_FRONTEND=noninteractive
@@ -32,10 +30,9 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     PRE_UPDATE_BACKUP="true" \
     WARN_ON_STOP="true" \
     ARK_TOOLS_VERSION="${ARK_TOOLS_VERSION}" \
-    ARK_SERVER_VOLUME="/app" \
+    ARK_SERVER_VOLUME="/opt/steamcmd" \
     TEMPLATE_DIRECTORY="/conf.d" \
-    STEAM_HOME="${HOMEDIR}" \
-    USER="root" \
+    STEAM_HOME="/home/${USER}" \
     STEAM_USER="${USER}" \
     STEAM_LOGIN="anonymous" \
     GAME_CLIENT_PORT="7777" \
@@ -44,6 +41,9 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     SERVER_LIST_PORT="27015"
 
 ENV ARK_TOOLS_DIR="${ARK_SERVER_VOLUME}/arkmanager"
+
+# Switch to root for package installation
+USER root
 
 RUN dpkg --add-architecture i386 && \
     apt-get clean && \
@@ -70,27 +70,18 @@ RUN dpkg --add-architecture i386 && \
     echo "Downloading ARK server tools version: ${DOWNLOAD_VERSION}" && \
     curl -fsSL "https://github.com/arkmanager/ark-server-tools/archive/v${DOWNLOAD_VERSION}.tar.gz" | \
         tar xzf - -C /tmp/ && \
-    rm -rf /etc/arkmanager 2>/dev/null || true && \
     cd "/tmp/ark-server-tools-${DOWNLOAD_VERSION}/tools" && \
-    sed -i 's/steam\./root:/g' install.sh && \
-    sed -i 's/chown steam/chown root/g' install.sh && \
-    sed -i 's/root\./root:/g' install.sh && \
-    bash -x install.sh root && \
+    bash -x install.sh "${USER}" && \
     ln -s /usr/local/bin/arkmanager /usr/bin/arkmanager && \
-    sed -i 's/steamcmd_user="steam"/steamcmd_user="root"/g' /etc/arkmanager/arkmanager.cfg && \
-    sed -i 's/arkserverroot="\/home\/steam"/arkserverroot="\/opt\/steam"/g' /etc/arkmanager/arkmanager.cfg && \
-    install -d "${ARK_SERVER_VOLUME}" && \
-    cd "${HOMEDIR}" && HOME="${HOMEDIR}" ${STEAMCMDDIR}/steamcmd.sh +login anonymous +quit && \
+    install -d -o "${USER}" "${ARK_SERVER_VOLUME}" && \
+    su "${USER}" -c "bash -x ${STEAMCMDDIR}/steamcmd.sh +login anonymous +quit" && \
     apt-get -y autoremove && \
     apt-get -y autoclean && \
     apt-get -y clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* ${HOMEDIR}/.local/share/Steam/logs/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /home/steam/Steam/logs/*
 
 COPY bin/ /
 COPY conf.d ${TEMPLATE_DIRECTORY}
-
-RUN chmod +x /docker-entrypoint.sh && \
-    chmod +x /steam-entrypoint.sh
 
 EXPOSE ${GAME_CLIENT_PORT}/udp \
        ${UDP_SOCKET_PORT}/udp \
@@ -99,6 +90,7 @@ EXPOSE ${GAME_CLIENT_PORT}/udp \
 
 VOLUME ["${ARK_SERVER_VOLUME}"]
 WORKDIR ${ARK_SERVER_VOLUME}
+USER ${USER}
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD []
