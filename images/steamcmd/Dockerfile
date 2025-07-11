@@ -29,6 +29,7 @@ RUN dpkg --add-architecture i386 \
     && apt-get -y upgrade \
     && apt-get -y install --no-install-recommends --no-install-suggests \
         ca-certificates \
+        nano \
         locales \
         steamcmd \
         lib32gcc-s1 \
