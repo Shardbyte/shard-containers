@@ -83,7 +83,6 @@ services:
     image: 'shardbyte/docker-ark:latest'
     container_name: ark_server
     restart: unless-stopped
-    user: "0:0"
     environment:
       SESSION_NAME: "My Production ARK Server"
       SERVER_MAP: "TheIsland"
@@ -203,7 +202,6 @@ services:
     image: 'shardbyte/docker-ark:latest'
     container_name: ark_server
     restart: unless-stopped
-    user: "0:0"
     environment:
       # === Steam Authentication (uncomment if needed for DLCs/private mods)
       # STEAM_LOGIN: ${STEAM_LOGIN}
