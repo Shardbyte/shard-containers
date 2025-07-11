@@ -93,7 +93,7 @@ EXPOSE ${GAME_CLIENT_PORT}/udp \
 
 VOLUME ["${ARK_SERVER_VOLUME}"]
 WORKDIR ${ARK_SERVER_VOLUME}
-USER ${USER}
 
+# Keep as root for entrypoint script (will drop to steam user via gosu)
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD []
