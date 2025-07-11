@@ -72,6 +72,8 @@ RUN dpkg --add-architecture i386 && \
         tar xzf - -C /tmp/ && \
     rm -rf /etc/arkmanager 2>/dev/null || true && \
     cd "/tmp/ark-server-tools-${DOWNLOAD_VERSION}/tools" && \
+    sed -i 's/steam\./root:/g' install.sh && \
+    sed -i 's/chown steam/chown root/g' install.sh && \
     bash -x install.sh root && \
     ln -s /usr/local/bin/arkmanager /usr/bin/arkmanager && \
     install -d "${ARK_SERVER_VOLUME}" && \
