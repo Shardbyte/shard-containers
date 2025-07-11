@@ -12,6 +12,8 @@ LABEL author="Shardbyte" \
       org.opencontainers.image.title="docker-ark" \
       org.opencontainers.image.licenses="MIT"
 
+
+USER root
 ARG ARK_TOOLS_VERSION="latest"
 ARG IMAGE_VERSION="dev"
 ARG DEBIAN_FRONTEND=noninteractive
@@ -41,9 +43,6 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     SERVER_LIST_PORT="27015"
 
 ENV ARK_TOOLS_DIR="${ARK_SERVER_VOLUME}/arkmanager"
-
-# Ensure we're running as root
-USER root
 
 RUN dpkg --add-architecture i386 && \
     apt-get clean && \
