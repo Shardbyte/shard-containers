@@ -22,25 +22,26 @@ The basic configuration of your server is done by using environment variables wh
 
 | Variable | Default Value | Explanation |
 |:-----------------:|:----------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------:|
-| `SESSION_NAME` | `Dockerized ARK Server by github.com/hermsi1337` | The name of your ARK session which is visible in game when searching for servers |
+| `STEAM_LOGIN` | `anonymous` | Steam login username (use for non-anonymous DLCs/mods) |
+| `SESSION_NAME` | `SHARDBYTE--DOCKERIZED-ARK` | The name of your ARK session which is visible in game when searching for servers |
 | `SERVER_MAP` | `TheIsland` | Desired map you want to play |
-| `SERVER_PASSWORD` | `YouShallNotPass` | Server password which is required to join your session (use empty string to disable password authentication) |
+| `SERVER_PASSWORD` | `theDEFAULTpassword` | Server password which is required to join your session (use empty string to disable password authentication) |
 | `SERVER_PVE` | `false` | Enable PVE mode |
-| `ADMIN_PASSWORD` | `Th155houldD3f1n3tlyB3Chang3d` | Admin password to access the admin console of ARK |
+| `ADMIN_PASSWORD` | `changeMEplease` | Admin password to access the admin console of ARK |
 | `MAX_PLAYERS` | `20` | Maximum number of players to join your session |
 | `UPDATE_ON_START` | `false` | Whether you want to update the ARK server upon startup or not |
 | `BACKUP_ON_STOP` | `false` | Create a backup before gracefully stopping the ARK server |
-| `BACKUP_POST_COMMAND` | `echo 'Backup complete'` | Command to run after backup |
+| `BACKUP_POST_COMMAND` | `echo 'Backup Complete!'` | Command to run after backup |
 | `PRE_UPDATE_BACKUP` | `true` | Create a backup before updating ARK server |
 | `WARN_ON_STOP` | `true` | Broadcast a warning upon graceful shutdown |
 | `ENABLE_CROSSPLAY` | `false` | Enable crossplay. When enabled, BattlEye should be disabled as it likes to disconnect Epic players |
 | `DISABLE_BATTLEYE` | `false` | Disable BattlEye protection |
-| `ARK_SERVER_VOLUME` | `/app` | Path where the server files are stored |
+| `ARK_SERVER_VOLUME` | `/opt/ark` | Path where the server files are stored (Only change if you know what you're doing)|
+| `GAME_MOD_IDS` | `empty` | Additional game mods you want to install, separated by comma (e.g. `GAME_MOD_IDS=487516323,487516324,487516325`) |
 | `GAME_CLIENT_PORT` | `7777` | Exposed game client port |
 | `UDP_SOCKET_PORT` | `7778` | Raw UDP socket port (always Game client port +1) |
 | `RCON_PORT` | `27020` | Exposed RCON port |
 | `SERVER_LIST_PORT` | `27015` | Exposed server list port |
-| `GAME_MOD_IDS` | `empty` | Additional game mods you want to install, separated by comma (e.g. `GAME_MOD_IDS=487516323,487516324,487516325`) |
 
 #### Get Things Running
 
@@ -53,9 +54,9 @@ I personally prefer `docker-compose` but for those of you who want to run their 
 docker run -d \
   --name="ark_server" \
   --restart=always \
-  -v "${HOME}/ark-server:/app" \
-  -e SESSION_NAME="Awesome ARK is awesome" \
-  -e ADMIN_PASSWORD="FooB4r" \
+  -v "${HOME}/ark-server:/opt/ark" \
+  -e SESSION_NAME="SHARDBYTE--DOCKERIZED-ARK" \
+  -e ADMIN_PASSWORD="changeMEplease" \
   shardbyte/docker-ark:latest
 ```
 
@@ -75,7 +76,7 @@ In order to startup your own ARK server with `docker-compose` - which I personal
 services:
 #######################################################
   ark_server:
-    image: 'ghcr.io/shardbyte/steamcmd:latest'
+    image: 'shardbyte/docker-ark:latest'
     container_name: ark_server
     restart: unless-stopped
     environment:
@@ -94,23 +95,20 @@ services:
       WARN_ON_STOP: ${WARN_ON_STOP}
       ENABLE_CROSSPLAY: ${ENABLE_CROSSPLAY}
       DISABLE_BATTLEYE: ${DISABLE_BATTLEYE}
+# === Dont change this unless you know what you're doing
       ARK_SERVER_VOLUME: ${ARK_SERVER_VOLUME}
       GAME_MOD_IDS: ${GAME_MOD_IDS}
       GAME_CLIENT_PORT: ${GAME_CLIENT_PORT}
       UDP_SOCKET_PORT: ${UDP_SOCKET_PORT}
       RCON_PORT: ${RCON_PORT}
       SERVER_LIST_PORT: ${SERVER_LIST_PORT}
-# === This setup is only necessary if you want to use a custom ARK server configuration
-      # GUS_FILE: ${GUS_DIR}
-      # GI_FILE: ${GI_DIR}
     volumes:
 # === This setup is necessary if you have to download a non-anonymous appID/modID
       # - '${STEAM_SESSION_VOLUME}:/home/steam/Steam'
-# === This setup is only necessary if you want to use a custom ARK server configuration
-      # - '${ARK_SERVER_VOLUME}/custom_ini/GameUserSettings.ini:/app/server/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini'
-      # - '${ARK_SERVER_VOLUME}/custom_ini/Game.ini:/app/server/ShooterGame/Saved/Config/LinuxServer/Game.ini'
-      - '${ARK_SERVER_VOLUME}:/app'
-      - '${ARK_SERVER_VOLUME}/ark-backups:/home/steam/ARK-Backups'
+# === Mount ARK server data directory
+      - '/my/host/mounted/dir:/opt/ark'
+# === Mount ARK manager configuration directory
+      - '/my/host/mounted/dir/arkmanager:/opt/arkmanager'
     networks:
       - ark_network
     ports:
@@ -141,8 +139,8 @@ After your container is up and ARK is installed you can start tweaking your conf
 
 The main config files are located at the following path in the container:
 
-- `/app/server/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini`
-- `/app/server/ShooterGame/Saved/Config/LinuxServer/Game.ini`
+- `/opt/ark/server/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini`
+- `/opt/ark/server/ShooterGame/Saved/Config/LinuxServer/Game.ini`
 
 You can easily apply your changes directly into these files.
 
