@@ -30,7 +30,7 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     PRE_UPDATE_BACKUP="true" \
     WARN_ON_STOP="true" \
     ARK_TOOLS_VERSION="${ARK_TOOLS_VERSION}" \
-    ARK_SERVER_VOLUME="/opt/steamcmd" \
+    ARK_SERVER_VOLUME="/opt/ark" \
     TEMPLATE_DIRECTORY="/conf.d" \
     STEAM_HOME="/home/${USER}" \
     STEAM_USER="${USER}" \
@@ -40,9 +40,7 @@ ENV IMAGE_VERSION="${IMAGE_VERSION}" \
     RCON_PORT="27020" \
     SERVER_LIST_PORT="27015"
 
-ENV ARK_TOOLS_DIR="${ARK_SERVER_VOLUME}/arkmanager"
-
-# Switch to root for package installation
+ENV ARK_TOOLS_DIR="/opt/arkmanager"
 USER root
 
 RUN dpkg --add-architecture i386 && \
@@ -83,7 +81,6 @@ RUN dpkg --add-architecture i386 && \
 COPY bin/ /
 COPY conf.d ${TEMPLATE_DIRECTORY}
 
-# Make all entrypoint scripts executable for all users
 RUN chmod +x /docker-entrypoint.sh /steam-entrypoint.sh
 
 EXPOSE ${GAME_CLIENT_PORT}/udp \
@@ -94,6 +91,5 @@ EXPOSE ${GAME_CLIENT_PORT}/udp \
 VOLUME ["${ARK_SERVER_VOLUME}"]
 WORKDIR ${ARK_SERVER_VOLUME}
 
-# Keep as root for entrypoint script (will drop to steam user via gosu)
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD []
