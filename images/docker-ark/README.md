@@ -226,6 +226,7 @@ services:
       WARN_ON_STOP: ${WARN_ON_STOP:-"true"}
 
       # === System Configuration (Advanced)
+      CLUSTER_ID: ${CLUSTER_ID:-"im_a_random_cluster_id"}
       ARK_SERVER_VOLUME: "/opt/ark"
 
       # === Mods and Networking
@@ -245,6 +246,8 @@ services:
       # === ARK Manager Configuration
       - '${ARK_CONFIG_PATH:-./ark-config}:/opt/arkmanager'
 
+      # === Cluster data
+      - '${ARK_CLUSTER_PATH:-./ark-cluster}:/opt/cluster'
     networks:
       - ark_network
 
@@ -288,6 +291,7 @@ GAME_MOD_IDS=731604991,899987403
 # Paths
 ARK_DATA_PATH=./ark-data
 ARK_CONFIG_PATH=./ark-config
+ARK_CLUSTER_PATH=./ark-cluster
 ```
 
 Start your server:

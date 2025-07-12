@@ -28,6 +28,7 @@ services:
       WARN_ON_STOP: ${WARN_ON_STOP}
       ENABLE_CROSSPLAY: ${ENABLE_CROSSPLAY}
       DISABLE_BATTLEYE: ${DISABLE_BATTLEYE}
+      CLUSTER_ID: ${CLUSTER_ID}
 # === Dont change this unless you know what you're doing
       ARK_SERVER_VOLUME: ${ARK_SERVER_VOLUME}
       GAME_MOD_IDS: ${GAME_MOD_IDS}
@@ -42,6 +43,8 @@ services:
       - '/my/host/mounted/dir:/opt/ark'
 # === Mount ARK manager configuration directory
       - '/my/host/mounted/dir/arkmanager:/opt/arkmanager'
+# === Mount shared cluster directory for cross-server data transfer
+      - '/my/host/mounted/dir/shared/cluster:/opt/cluster'
     networks:
       - ark_network
     ports:
