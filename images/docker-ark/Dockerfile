@@ -56,6 +56,7 @@ RUN dpkg --add-architecture i386 && \
         gosu \
         gzip \
         bzip2 \
+        procps \
         perl-base \
         perl-modules \
         libc6-i386 \
