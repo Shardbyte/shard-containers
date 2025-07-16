@@ -12,13 +12,11 @@ LABEL   author="Shardbyte" maintainer="containers@shardbyte.com" \
         org.opencontainers.image.licenses="MIT"
 
 ARG PUID=1000
-ARG DEBIAN_FRONTEND=noninteractive
 ENV USER=steam
 ENV HOMEDIR="/home/${USER}"
 ENV STEAMCMDDIR="${HOMEDIR}/steamcmd" \
     LANG=en_US.UTF-8
 
-# Configure Steam package installation prompts & Debian sources
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo steam steam/question select "I AGREE" | debconf-set-selections \
     && echo steam steam/license note '' | debconf-set-selections \
@@ -46,16 +44,7 @@ RUN dpkg --add-architecture i386 \
     && apt-get -y autoclean \
     && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && rm -rf /var/cache/debconf/* \
-    && rm -rf /var/lib/dpkg/info/*.postrm \
-    && rm -rf /usr/share/doc/* \
-    && rm -rf /usr/share/man/* \
-    && rm -rf /usr/share/info/* \
-    && rm -rf /usr/share/locale/* \
-    && find /usr/share/i18n/locales/ -type f ! -name 'en_US' -delete \
-    && find /usr/share/i18n/charmaps/ -type f ! -name 'UTF-8.gz' -delete \
-    && find /usr/lib -name "*.a" -delete \
-    && find /usr/lib -name "*.la" -delete
+    && rm -rf /var/cache/debconf/*
 
 USER ${USER}
 WORKDIR ${HOMEDIR}
