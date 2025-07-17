@@ -26,24 +26,24 @@ jobs:
             variant: interactive
             dockerfile: Dockerfile.interactive
             tags: |
-              ghcr.io/${{ github.repository_owner }}/steamcmd:interactive
-              docker.io/${{ github.repository_owner }}/steamcmd:interactive
+              ghcr.io/shardbyte/steamcmd:interactive
+              docker.io/shardbyte/steamcmd:interactive
           - name: "SteamCMD Non-Interactive"
             image: steamcmd
             variant: noninteractive
             dockerfile: Dockerfile.noninteractive
             tags: |
-              ghcr.io/${{ github.repository_owner }}/steamcmd:noninteractive
-              docker.io/${{ github.repository_owner }}/steamcmd:noninteractive
-              ghcr.io/${{ github.repository_owner }}/steamcmd:latest
-              docker.io/${{ github.repository_owner }}/steamcmd:latest
+              ghcr.io/shardbyte/steamcmd:noninteractive
+              docker.io/shardbyte/steamcmd:noninteractive
+              ghcr.io/shardbyte/steamcmd:latest
+              docker.io/shardbyte/steamcmd:latest
           - name: "Docker ARK Server"
             image: docker-ark
             variant: default
             dockerfile: Dockerfile
             tags: |
-              ghcr.io/${{ github.repository_owner }}/docker-ark:latest
-              docker.io/${{ github.repository_owner }}/docker-ark:latest
+              ghcr.io/shardbyte/docker-ark:latest
+              docker.io/shardbyte/docker-ark:latest
 
     steps:
       - name: Checkout repository
