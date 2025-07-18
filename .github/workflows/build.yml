@@ -44,6 +44,13 @@ jobs:
             tags: |
               ghcr.io/shardbyte/docker-ark:latest
               docker.io/shardbyte/docker-ark:latest
+          - name: "ARKManager"
+            image: arkmanager
+            variant: default
+            dockerfile: Dockerfile.pelican
+            tags: |
+              ghcr.io/shardbyte/arkmanager:pelican
+              docker.io/shardbyte/arkmanager:pelican
 
     steps:
       - name: Checkout repository
