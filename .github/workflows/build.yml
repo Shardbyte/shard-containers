@@ -46,7 +46,7 @@ jobs:
               docker.io/shardbyte/docker-ark:latest
           - name: "ARKManager"
             image: arkmanager
-            variant: default
+            variant: pelican
             dockerfile: Dockerfile.pelican
             tags: |
               ghcr.io/shardbyte/arkmanager:pelican
