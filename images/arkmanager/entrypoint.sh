@@ -353,7 +353,7 @@ may_update
 
 # Function to monitor server status and display when online
 monitor_server_status() {
-    local check_interval=45     # Check every 45 seconds
+    local check_interval=15     # Check every 15 seconds
     local server_online=false
 
     # Wait for initial startup
