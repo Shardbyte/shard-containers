@@ -396,10 +396,10 @@ STATUS_MONITOR_PID=$!
 # SIGNAL HANDLING (Pre-shutdown Hook)
 # ===============================================================================
 
-# Trap SIGTERM to execute a command before shutdown
+# Trap SIGTERM and SIGINT to execute a command before shutdown
 SHOULD_EXIT_ON_SIGTERM=0
-on_sigterm() {
-    log_warning "SIGTERM received: Running pre-shutdown tasks..."
+on_signal() {
+    log_warning "Signal received: Running pre-shutdown tasks..."
     SHOULD_EXIT_ON_SIGTERM=1
     ./arkmanager stop --saveworld || log_warning "Failed to stop server gracefully before shutdown"
     if [[ -n "${STATUS_MONITOR_PID:-}" ]]; then
@@ -408,7 +408,7 @@ on_sigterm() {
     log_warning "Pre-shutdown tasks complete. Exiting."
     exit 0
 }
-trap on_sigterm SIGTERM
+trap on_signal SIGTERM SIGINT
 
 # ===============================================================================
 # STARTUP EXECUTION
