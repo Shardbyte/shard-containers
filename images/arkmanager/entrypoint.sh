@@ -393,6 +393,22 @@ monitor_server_status &
 STATUS_MONITOR_PID=$!
 
 # ===============================================================================
+# SIGNAL HANDLING (Pre-shutdown Hook)
+# ===============================================================================
+
+# Trap SIGTERM to execute a command before shutdown
+on_sigterm() {
+    log_warning "SIGTERM received: Running pre-shutdown tasks..."
+        ./arkmanager SaveWorld || log_warning "Failed to save world before shutdown"
+    if [[ -n "${STATUS_MONITOR_PID:-}" ]]; then
+        kill "${STATUS_MONITOR_PID}" 2>/dev/null || true
+    fi
+    log_warning "Pre-shutdown tasks complete. Exiting."
+    exit 0
+}
+trap on_sigterm SIGTERM
+
+# ===============================================================================
 # STARTUP EXECUTION
 # ===============================================================================
 
