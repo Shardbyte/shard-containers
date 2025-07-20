@@ -51,6 +51,13 @@ jobs:
             tags: |
               ghcr.io/shardbyte/arkmanager:pelican
               docker.io/shardbyte/arkmanager:pelican
+          - name: "ARKManager DEV"
+            image: arkmanager
+            variant: dev
+            dockerfile: Dockerfile.dev
+            tags: |
+              ghcr.io/shardbyte/arkmanager:dev
+              docker.io/shardbyte/arkmanager:dev
 
     steps:
       - name: Checkout repository

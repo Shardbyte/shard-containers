@@ -1,0 +1,115 @@
+#################################################
+# Copyright (c) Shardbyte. All Rights Reserved. #
+# SPDX-License-Identifier: MIT                  #
+#################################################
+#
+
+FROM debian:bookworm-slim
+
+LABEL author="Shardbyte" \
+      maintainer="containers@shardbyte.com" \
+      org.opencontainers.image.source="https://github.com/Shardbyte/shard-containers" \
+      org.opencontainers.image.description="ARK: Survival Evolved Server for Pelican with ARKManager Features" \
+      org.opencontainers.image.title="arkmanager-pelican" \
+      org.opencontainers.image.licenses="MIT"
+
+# ===============================================================================
+# ENVIRONMENT VARIABLES
+# ===============================================================================
+
+ENV USER=container \
+    HOME=/home/container \
+    BRANCH="master" \
+    STARTUP="start" \
+    TZ="UTC" \
+    DEBUG="false" \
+    ARK_SERVER_VOLUME="/home/container" \
+    ARK_TOOLS_DIR="/home/container/.arkmanager" \
+    SESSION_NAME="Pelican ARK Server" \
+    MAP="TheIsland" \
+    SERVER_PVE="false" \
+    MAX_PLAYERS="20" \
+    SERVER_PASSWORD="" \
+    ADMIN_PASSWORD="changeMEplease" \
+    UPDATE_ON_START="false" \
+    PRE_UPDATE_BACKUP="false" \
+    BACKUP_POST_COMMAND="" \
+    MODS="" \
+    GAME_CLIENT_PORT="7777" \
+    UDP_SOCKET_PORT="7778" \
+    SERVER_LIST_PORT="27015" \
+    RCON_PORT="27020" \
+    ENABLE_CROSSPLAY="false" \
+    DISABLE_BATTLEYE="false"
+
+# ===============================================================================
+# SYSTEM SETUP
+# ===============================================================================
+
+RUN dpkg --add-architecture i386 \
+    && apt update \
+    && apt -y upgrade \
+    && apt install -y --no-install-recommends \
+        jq \
+        sed \
+        tar \
+        perl \
+        lsof \
+        gzip \
+        curl \
+        cron \
+        nano \
+        bzip2 \
+        rsync \
+        procps \
+        locales \
+        iproute2 \
+        net-tools \
+        libc6-i386 \
+        lib32gcc-s1 \
+        lib32stdc++6 \
+        ca-certificates \
+    && sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LANG=en_US.UTF-8 \
+    && apt -y autoremove \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /tmp/* \
+    && rm -rf /var/tmp/* \
+    && rm -rf /var/cache/apt/* \
+    && rm -rf /var/cache/debconf/* \
+    && rm -rf /usr/share/doc/* \
+    && rm -rf /usr/share/man/* \
+    && rm -rf /usr/share/info/* \
+    && rm -rf /usr/share/pixmaps/* \
+    && rm -rf /usr/share/applications/* \
+    && find /usr/share/locale -mindepth 1 -maxdepth 1 ! -name 'en*' -exec rm -rf {} + \
+    && find /var/lib/dpkg -type f -name "*.md5sums" -delete \
+    && find /var/log -type f -name "*.log" -delete
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
+# ===============================================================================
+# USER SETUP
+# ===============================================================================
+
+RUN groupadd -g 988 container || true \
+    && useradd -m -d /home/container -s /bin/bash -g container container \
+    && mkdir -p "${ARK_TOOLS_DIR}" \
+    && chown -R container:container /home/container
+
+# ===============================================================================
+# CONFIGURATION FILES
+# ===============================================================================
+
+COPY --chown=container:container entrypoint-dev.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+USER container
+WORKDIR /home/container
+
+CMD ["/bin/bash", "/entrypoint.sh"]
