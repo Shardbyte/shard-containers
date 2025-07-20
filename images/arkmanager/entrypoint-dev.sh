@@ -418,13 +418,6 @@ cd /home/container || exit 1
 
 log_server "Starting ARK Server..."
 
-# Validate server binary exists
-[[ -f "/home/container/ShooterGame/Binaries/Linux/ShooterGameServer" ]] || {
-    log_error "ARK server binary not found at /home/container/ShooterGame/Binaries/Linux/ShooterGameServer"
-    log_error "Please ensure the server is properly installed via Pelican's egg installer."
-    exit 1
-}
-
 # Execute startup command
 MODIFIED_STARTUP=$(eval echo $(echo ./arkmanager ${STARTUP} --verbose | sed -e 's/{{/${/g' -e 's/}}/}/g'))
 
