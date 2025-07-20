@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ matrix.name }} (${{ matrix.variant }})
+    name: Build ${{ matrix.name }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
