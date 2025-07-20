@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   build:
+    name: Build ${{ matrix.name }} (${{ matrix.variant }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -101,6 +102,8 @@ jobs:
       - name: Build and push
         if: steps.changes.outputs.build == 'true'
         uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           context: ./images/${{ matrix.image }}
           file: ./images/${{ matrix.image }}/${{ matrix.dockerfile }}
