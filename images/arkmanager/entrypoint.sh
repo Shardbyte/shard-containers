@@ -351,10 +351,12 @@ may_update
 # SERVER STATUS MONITORING
 # ===============================================================================
 
-# Function to monitor server status and display when online
+# Function to monitor server status and display when online or player count changes
 monitor_server_status() {
     local check_interval=15     # Check every 15 seconds
     local server_online=false
+    local last_player_count=""
+    local initial_status_shown=false
 
     # Wait for initial startup
     sleep ${check_interval}
@@ -365,23 +367,80 @@ monitor_server_status() {
         status_output=$(./arkmanager status 2>/dev/null || echo "Status check failed")
 
         # Check if server is online
+        local server_is_online=false
         if echo "${status_output}" | grep -q "Server online:.*Yes"; then
-            if [[ "${server_online}" == "false" ]]; then
-                # Force a newline before status output to separate from prompt
-                echo ""
-                log_success "=== SERVER STATUS UPDATE ==="
-                # Display each line of status output with proper formatting
-                while IFS= read -r line; do
-                    [[ -n "$line" ]] && log_info "$line"
-                done <<< "${status_output}"
-                log_success "============================"
-                echo ""  # Add blank line after status
-                server_online=true
-                # Exit monitoring after showing status once
-                break
+            server_is_online=true
+        fi
+
+        # Extract current player count
+        local current_player_count=""
+        if echo "${status_output}" | grep -q "Active Steam Players:"; then
+            current_player_count=$(echo "${status_output}" | grep "Active Steam Players:" | sed 's/.*Active Steam Players: *//')
+        fi
+
+        # Determine if we should show status update
+        local show_update=false
+        local update_reason=""
+
+        # Show if server just came online
+        if [[ "${server_is_online}" == "true" && "${server_online}" == "false" ]]; then
+            show_update=true
+            update_reason="Server came online"
+        fi
+
+        # Show if player count changed (only after initial status has been shown)
+        if [[ "${server_is_online}" == "true" && "${initial_status_shown}" == "true" ]]; then
+            if [[ -n "${current_player_count}" && "${current_player_count}" != "${last_player_count}" ]]; then
+                show_update=true
+                if [[ -z "${update_reason}" ]]; then
+                    update_reason="Player count changed: ${last_player_count} → ${current_player_count}"
+                fi
             fi
-        else
+        fi
+
+        # Display status update if needed
+        if [[ "${show_update}" == "true" ]]; then
+            # Force a newline before status output to separate from prompt
+            echo ""
+            if [[ "${update_reason}" == "Server came online" ]]; then
+                log_success "=== SERVER STATUS UPDATE ==="
+            else
+                log_success "=== PLAYER COUNT UPDATE ==="
+                log_info "${update_reason}"
+                log_success "=========================="
+            fi
+
+            # Display each line of status output with proper formatting
+            while IFS= read -r line; do
+                [[ -n "$line" ]] && log_info "$line"
+            done <<< "${status_output}"
+
+            if [[ "${update_reason}" == "=== Server came online ===" ]]; then
+                log_success "============================"
+            fi
+            echo ""  # Add blank line after status
+
+            initial_status_shown=true
+        fi
+
+        # Update tracking variables
+        server_online="${server_is_online}"
+        if [[ -n "${current_player_count}" ]]; then
+            last_player_count="${current_player_count}"
+        fi
+
+        # If server goes offline, reset tracking
+        if [[ "${server_is_online}" == "false" ]]; then
+            if [[ "${server_online}" == "true" ]]; then
+                echo ""
+                log_warning "=== SERVER OFFLINE ==="
+                log_warning "Server has gone offline"
+                log_warning "======================"
+                echo ""
+            fi
             server_online=false
+            last_player_count=""
+            initial_status_shown=false
         fi
 
         sleep ${check_interval}
