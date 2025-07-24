@@ -453,7 +453,11 @@ monitor_shutdown() {
                 # Kill any background monitoring processes
                 [[ -n "${STATUS_MONITOR_PID}" ]] && kill "${STATUS_MONITOR_PID}" 2>/dev/null
                 [[ -n "${SHUTDOWN_MONITOR_PID}" ]] && kill "${SHUTDOWN_MONITOR_PID}" 2>/dev/null
-                # Exit the container
+                # Give processes a moment to clean up
+                sleep 1
+                # Force kill the container by killing PID 1 (init process)
+                kill -TERM 1 2>/dev/null || kill -KILL 1 2>/dev/null || true
+                # Exit the container as fallback
                 exit 0
             fi
         fi
