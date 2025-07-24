@@ -382,19 +382,17 @@ monitor_server_status() {
         local show_update=false
         local update_reason=""
 
-        # Show if server just came online
-        if [[ "${server_is_online}" == "true" && "${server_online}" == "false" ]]; then
+        # Show if server just came online (only once)
+        if [[ "${server_is_online}" == "true" && "${server_online}" == "false" && "${initial_status_shown}" == "false" ]]; then
             show_update=true
-            update_reason="Server came online"
+            update_reason="=== Server came online ==="
         fi
 
         # Show if player count changed (only after initial status has been shown)
         if [[ "${server_is_online}" == "true" && "${initial_status_shown}" == "true" ]]; then
             if [[ -n "${current_player_count}" && "${current_player_count}" != "${last_player_count}" ]]; then
                 show_update=true
-                if [[ -z "${update_reason}" ]]; then
-                    update_reason="Player count changed: ${last_player_count} → ${current_player_count}"
-                fi
+                update_reason="Player count changed: ${last_player_count} → ${current_player_count}"
             fi
         fi
 
@@ -415,8 +413,10 @@ monitor_server_status() {
                 [[ -n "$line" ]] && log_info "$line"
             done <<< "${status_output}"
 
-            if [[ "${update_reason}" == "=== Server came online ===" ]]; then
+            if [[ "${update_reason}" == "Server came online" ]]; then
                 log_success "============================"
+            else
+                log_success "=========================="
             fi
             echo ""  # Add blank line after status
 
@@ -429,27 +429,38 @@ monitor_server_status() {
             last_player_count="${current_player_count}"
         fi
 
-        # If server goes offline, reset tracking
-        if [[ "${server_is_online}" == "false" ]]; then
-            if [[ "${server_online}" == "true" ]]; then
-                echo ""
-                log_warning "=== SERVER OFFLINE ==="
-                log_warning "Server has gone offline"
-                log_warning "======================"
-                echo ""
+        sleep ${check_interval}
+    done
+}
+
+# ===============================================================================
+# SHUTDOWN MONITORING
+# ===============================================================================
+
+# Function to monitor for server shutdown message and exit container
+monitor_shutdown() {
+    local log_file="/home/container/log/arkmanager.log"
+    local check_interval=2  # Check every 2 seconds
+
+    # Wait a bit before starting to monitor
+    sleep 5
+
+    while true; do
+        # Check if log file exists and monitor for shutdown message
+        if [[ -f "${log_file}" ]]; then
+            if tail -n 20 "${log_file}" 2>/dev/null | grep -q "The server has been stopped"; then
+                log_info "Server shutdown detected - stopping container"
+                # Kill any background monitoring processes
+                [[ -n "${STATUS_MONITOR_PID}" ]] && kill "${STATUS_MONITOR_PID}" 2>/dev/null
+                [[ -n "${SHUTDOWN_MONITOR_PID}" ]] && kill "${SHUTDOWN_MONITOR_PID}" 2>/dev/null
+                # Exit the container
+                exit 0
             fi
-            server_online=false
-            last_player_count=""
-            initial_status_shown=false
         fi
 
         sleep ${check_interval}
     done
 }
-
-# Start server status monitoring in background
-monitor_server_status &
-STATUS_MONITOR_PID=$!
 
 # ===============================================================================
 # STARTUP EXECUTION
@@ -488,6 +499,14 @@ if [[ ${#additional_args[@]} -gt 0 ]]; then
 fi
 
 log_server "Starting server with command: ${MODIFIED_STARTUP}"
+
+# Start shutdown monitoring in background
+monitor_shutdown &
+SHUTDOWN_MONITOR_PID=$!
+
+# Start server status monitoring in background
+monitor_server_status &
+STATUS_MONITOR_PID=$!
 
 # Execute the startup command and handle exit properly
 ${MODIFIED_STARTUP}
