@@ -223,12 +223,12 @@ arkwarnshutdownminutes="5"
 arkwarnrestartminutes="5"
 arkwarnupdateminutes="5"
 
-msgWarnUpdateMinutes="This ARK server will shutdown for an update in %d minutes"
-msgWarnUpdateSeconds="This ARK server will shutdown for an update in %d seconds"
-msgWarnRestartMinutes="This ARK server will shutdown for a restart in %d minutes"
-msgWarnRestartSeconds="This ARK server will shutdown for a restart in %d seconds"
-msgWarnShutdownMinutes="This ARK server will shutdown in %d minutes"
-msgWarnShutdownSeconds="This ARK server will shutdown in %d seconds"
+msgWarnUpdateMinutes="Survivors, a server update will begin in %d minute(s). Please prepare for shutdown."
+msgWarnUpdateSeconds="Survivors, a server update will begin in %d second(s). Brace for shutdown."
+msgWarnRestartMinutes="Heads up! Server restart in %d minute(s). Wrap up your activities."
+msgWarnRestartSeconds="Heads up! Server restart in %d second(s)."
+msgWarnShutdownMinutes="Warning: this ARK server will power down in %d minute(s)."
+msgWarnShutdownSeconds="Warning: this ARK server will power down in %d second(s)."
 
 # ===============================================================================
 # PATHS AND LOGGING
@@ -434,41 +434,6 @@ monitor_server_status() {
 }
 
 # ===============================================================================
-# SHUTDOWN MONITORING
-# ===============================================================================
-
-# Function to monitor for server shutdown message and exit container
-monitor_shutdown() {
-    local log_file="/home/container/log/arkmanager.log"
-    local check_interval=2  # Check every 2 seconds
-
-    # Wait a bit before starting to monitor
-    sleep 5
-
-    while true; do
-        # Check if log file exists and monitor for shutdown message
-        if [[ -f "${log_file}" ]]; then
-            if tail -n 20 "${log_file}" 2>/dev/null | grep -q "The server has been stopped"; then
-                log_info "Server shutdown detected - stopping container"
-                # Kill any background monitoring processes
-                [[ -n "${STATUS_MONITOR_PID}" ]] && kill "${STATUS_MONITOR_PID}" 2>/dev/null
-                [[ -n "${SHUTDOWN_MONITOR_PID}" ]] && kill "${SHUTDOWN_MONITOR_PID}" 2>/dev/null
-                # Give processes a moment to clean up
-                sleep 2
-                # For Pelican Panel - kill all processes and exit
-                pkill -f "ShooterGameServer" 2>/dev/null || true
-                pkill -f "arkmanager" 2>/dev/null || true
-                pkill -f "bash" 2>/dev/null || true
-                # Force exit the entrypoint script
-                kill -TERM $$ 2>/dev/null || kill -KILL $$ 2>/dev/null || exit 0
-            fi
-        fi
-
-        sleep ${check_interval}
-    done
-}
-
-# ===============================================================================
 # STARTUP EXECUTION
 # ===============================================================================
 
@@ -505,10 +470,6 @@ if [[ ${#additional_args[@]} -gt 0 ]]; then
 fi
 
 log_server "Starting server with command: ${MODIFIED_STARTUP}"
-
-# Start shutdown monitoring in background
-monitor_shutdown &
-SHUTDOWN_MONITOR_PID=$!
 
 # Start server status monitoring in background
 monitor_server_status &
