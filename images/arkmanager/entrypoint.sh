@@ -454,11 +454,13 @@ monitor_shutdown() {
                 [[ -n "${STATUS_MONITOR_PID}" ]] && kill "${STATUS_MONITOR_PID}" 2>/dev/null
                 [[ -n "${SHUTDOWN_MONITOR_PID}" ]] && kill "${SHUTDOWN_MONITOR_PID}" 2>/dev/null
                 # Give processes a moment to clean up
-                sleep 1
-                # Force kill the container by killing PID 1 (init process)
-                kill -TERM 1 2>/dev/null || kill -KILL 1 2>/dev/null || true
-                # Exit the container as fallback
-                exit 0
+                sleep 2
+                # For Pelican Panel - kill all processes and exit
+                pkill -f "ShooterGameServer" 2>/dev/null || true
+                pkill -f "arkmanager" 2>/dev/null || true
+                pkill -f "bash" 2>/dev/null || true
+                # Force exit the entrypoint script
+                kill -TERM $$ 2>/dev/null || kill -KILL $$ 2>/dev/null || exit 0
             fi
         fi
 
